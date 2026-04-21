@@ -1,3 +1,5 @@
+// As per my knowledge -> qoute by sir Aqib rehman
+
 #include <iostream>
 #include <fstream>
 #include <cmath>
