@@ -1,4 +1,3 @@
-// additional
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -9,8 +8,8 @@
 using namespace sf;
 using namespace std;
 
-int screen_x = 1600;
-int screen_y = 900;
+int screen_x = 1920;
+int screen_y = 1980;
 
 // prototypes
 void draw_player(RenderWindow &window, Sprite &playerSprite, float player_x, float player_y);
