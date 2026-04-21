@@ -1,5 +1,3 @@
-// As per my knowledge -> qoute by sir Aqib rehman
-
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -7,8 +5,10 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Window.hpp>
 
+
 using namespace sf;
 using namespace std;
+
 
 int screen_x = 1600;
 int screen_y = 900;
