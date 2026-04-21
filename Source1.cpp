@@ -1,7 +1,10 @@
+// kahan se aya me hu don
+
 #include <SFML/Graphics.hpp>
 #include <optional>
 
-int main() {
+int main() 
+{
     // SFML 3 uses sf::VideoMode({width, height})
     auto window = sf::RenderWindow(sf::VideoMode({ 800, 600 }), "SFML 3 + vcpkg Success!");
 
