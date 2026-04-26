@@ -14,6 +14,7 @@ class InfantryEnemy : public Enemy {
         virtual ~InfantryEnemy(){}
         virtual void update(float TimeChange) override = 0;
         virtual void attack() override = 0;
+        virtual Enemy* create(float x, float y, int biome) = 0; 
         virtual void move(float TimeChange) override {
             state = state_Patrolling;
         }
@@ -35,6 +36,9 @@ class RebelSoldier : public InfantryEnemy {
 
         void attack() override {
            state = state_Attacking;
+        }
+        Enemy* create(float x, float y, int biome) override{
+            return new RebelSoldier(x, y, biome);
         }
         
         void update(float TimeChange) override {
@@ -79,6 +83,9 @@ class ShieldedSoldier : public InfantryEnemy {
             return false;
         }
 
+        Enemy* create(float x, float y, int biome) override{
+                return new ShieldedSoldier(x, y, biome);
+        }
 
         void takeDamage(int amount, int weaponType, int hitDirection) override {
             if (!isAlive) return;
@@ -142,6 +149,10 @@ class BazookaSoldier : public InfantryEnemy {
             reloadTime = reloadcooldown;
         }
 
+        Enemy* create(float x, float y, int biome) override{
+            return new BazookaSoldier(x, y, biome);
+        }
+
         void update(float TimeChange) override {
             if(!isAlive){
                 return;
@@ -195,6 +206,9 @@ class GrenadeSoldier : public InfantryEnemy {
             }
             state = state_Attacking;
             throwTime = throwCoolDown;
+        }
+        Enemy* create(float x, float y, int biome) override{
+            return new GrenadeSoldier(x, y, biome);
         }
 
         void update(float TimeChange) override {

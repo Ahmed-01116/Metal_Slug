@@ -90,7 +90,7 @@ private:
         players[0] = new Marco(380, 610, marco_w, marco_h);
 
         int tarma_w = 32, tarma_h = 38;
-        players[1] = new Tarma(380, 610, tarma_w, tarma_w);
+        players[1] = new Tarma(380, 610, tarma_w, tarma_h);
 
         int eri_w = 29, eri_h = 39;
         players[2] = new Eri(380, 610, eri_w, eri_h);

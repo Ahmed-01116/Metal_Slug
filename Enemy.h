@@ -21,6 +21,9 @@ const int type_Paratrooper = 4;
 const int type_Mummy_warrior = 5;
 const int type_Zombie = 6;
 const int type_Martian = 7;
+const int type_FlyingTara   = 8;
+const int type_M15ABradley  = 9;
+const int type_EnemySub     = 10;
 
 //Weapon Types
 const int weapon_Bullet = 0;
@@ -55,7 +58,8 @@ class Enemy {
         virtual void update(float TimeChange) = 0;
         virtual void attack() = 0;
         virtual void move(float TimeChange)= 0;
-
+        virtual Enemy* create(float x, float y, int biome) = 0; 
+        
         virtual void takeDamage(int amount , int weapontype , int hitDirection){
             if(!isAlive){
                 return;
