@@ -28,8 +28,7 @@ protected:
     Sprite sprite;
 
 public:
-    Player(float startX, float startY, const char *spritePath, int pw, int ph,
-           float sX = 4.0f, float sY = 4.0f)
+    Player(float startX, float startY, const char *spritePath, int pw, int ph, float sX = 4.0f, float sY = 4.0f)
     {
         x = startX;
         y = startY;
@@ -77,6 +76,7 @@ public:
                 velocityX = maxSpeed;
 
             sprite.setScale(scaleX, scaleY);
+            sprite.setOrigin(0, 0);
             facingRight = true;
         }
         else if (Keyboard::isKeyPressed(Keyboard::Left))
@@ -86,6 +86,7 @@ public:
                 velocityX = -maxSpeed;
 
             sprite.setScale(-scaleX, scaleY);
+            sprite.setOrigin(Pwidth / scaleX, 0);
             facingRight = false;
         }
         else

@@ -3,10 +3,11 @@
 
 class Marco : public Player
 {
-public:
+private:
     bool dualFireActive;
     float dualFireTimer;
 
+public:
     Marco(float startX, float startY, int pw, int ph) : Player(startX, startY, "Sprites/marco_rossi.png", pw, ph)
     {
         // 25% higher fire rate — weapon system mein handle hoga
@@ -46,6 +47,10 @@ public:
     bool canPierceShield()
     {
         return true;
+    }
+    bool getDualFireActive() const
+    {
+        return dualFireActive;
     }
 
     void draw(RenderWindow &window, float offsetX) override

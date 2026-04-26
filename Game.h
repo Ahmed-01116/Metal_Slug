@@ -4,7 +4,9 @@
 #include "Marco.h"
 #include "Tarma.h"
 #include "Eri.h"
-#include "Fiolina.h"
+#include "Fio.h"
+#include "Enemy.h"
+#include "EnemyFactory.h"
 
 using namespace sf;
 
@@ -12,9 +14,9 @@ class Game
 {
 private:
     RenderWindow window;
+
     int screenX, screenY;
 
-    // Level
     const int cellSize = 64;
     const int height = 14;
     const int width = 110;
@@ -23,14 +25,13 @@ private:
     Texture wallTex;
     Sprite wallSprite;
 
-    // Player
     Player *players[4];
     int currentActivePlayer;
     Player *active;
 
-    // Manual camera
-    float offsetX;
+    EnemySpawnFactory spawnFactory;
 
+    float offsetX;
     Clock clock;
 
 public:
@@ -39,14 +40,17 @@ public:
         screenX = 1920;
         screenY = 1080;
 
-        window.create(VideoMode(screenX, screenY), "Metal Slug", Style::Default);
+        window.create(VideoMode(screenX, screenY), "Metal Slug");
         window.setFramerateLimit(60);
 
         setupLevel();
         setupPlayers();
+        setupEnemies();
 
         currentActivePlayer = 0;
         active = players[currentActivePlayer];
+
+        offsetX = 0;
     }
 
     ~Game()
@@ -94,9 +98,14 @@ private:
 
         int eri_w = 29, eri_h = 39;
         players[2] = new Eri(380, 610, eri_w, eri_h);
-        
+
         int fio_w = 28, fio_h = 35;
         players[3] = new Fiolina(380, 610, fio_w, fio_h);
+    }
+
+    void setupEnemies()
+    {
+        spawnFactory.spawnLevelEnemies(1);
     }
 
     void handleEvents(Event &ev)
@@ -132,7 +141,10 @@ private:
         active->updateTimers(dt);
         resolveCollision();
 
-        offsetX = active->x - screenX / 2;
+        spawnFactory.updateAll(dt, active->getX(), active->getY());
+
+        offsetX = active->getX() - screenX / 2;
+
         if (offsetX < 0)
             offsetX = 0;
         float maxOffset = (width * cellSize) - screenX;
@@ -142,50 +154,46 @@ private:
 
     void resolveCollision()
     {
-        active->isGrounded = false;
+        active->setIsGrounded(false);
 
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
             {
-                if (lvl[i][j] == 'g')
+                if (lvl[i][j] != 'g')
+                    continue;
+
+                float tileX = j * cellSize;
+                float tileY = i * cellSize;
+
+                float px = active->getX();
+                float py = active->getY();
+                
+                float pRight = px + active->getWidth();
+                float pBottom = py + active->getHeight();
+                float tRight = tileX + cellSize;
+                float tBottom = tileY + cellSize;
+
+                bool overlap = pRight > tileX && px < tRight && pBottom > tileY && py < tBottom;
+
+                if (overlap)
                 {
-                    float tileX = j * cellSize;
-                    float tileY = i * cellSize;
-
-                    float pLeft = active->x;
-                    float pRight = active->x + active->Pwidth;
-                    float pTop = active->y;
-                    float pBottom = active->y + active->Pheight;
-
-                    float tLeft = tileX;
-                    float tRight = tileX + cellSize;
-                    float tTop = tileY;
-                    float tBottom = tileY + cellSize;
-
-                    bool overlap = pRight > tLeft &&
-                                   pLeft < tRight &&
-                                   pBottom > tTop &&
-                                   pTop < tBottom;
-
-                    if (overlap)
+                    if (active->getVelocityY() > 0 && pBottom - active->getVelocityY() <= tileY)
                     {
-                        if (active->velocityY > 0 && pBottom - active->velocityY <= tTop)
-                        {
-                            active->y = tTop - active->Pheight;
-                            active->velocityY = 0;
-                            active->isGrounded = true;
-                        }
-                        else if (active->velocityY < 0 && pTop - active->velocityY >= tBottom)
-                        {
-                            active->y = tBottom;
-                            active->velocityY = 0;
-                        }
-                        else if (active->velocityX > 0)
-                            active->x = tLeft - active->Pwidth;
-                        else if (active->velocityX < 0)
-                            active->x = tRight;
+                        active->setY(tileY - active->getHeight());
+                        active->setVelocityY(0);
+                        active->setIsGrounded(true);
                     }
+                    else if (active->getVelocityY() < 0 && py - active->getVelocityY() >= tileY + cellSize)
+                    {
+                        active->setY(tileY + cellSize);
+                        active->setVelocityY(0);
+                    }
+                    else if (active->getVelocityX() > 0)
+                        active->setX(tileX - active->getWidth());
+
+                    else if (active->getVelocityX() < 0)
+                        active->setX(tileX + cellSize);
                 }
             }
         }
@@ -204,18 +212,13 @@ private:
     void displayLevel()
     {
         for (int i = 0; i < height; i++)
-        {
             for (int j = 0; j < width; j++)
             {
                 if (lvl[i][j] == 'g')
                 {
-                    float drawX = j * cellSize - offsetX;
-                    float drawY = i * cellSize;
-
-                    wallSprite.setPosition(drawX, drawY);
+                    wallSprite.setPosition(j * cellSize - offsetX, i * cellSize);
                     window.draw(wallSprite);
                 }
             }
-        }
     }
 };

@@ -1,237 +1,291 @@
 #pragma once
-#include"Enemy.h"
+#include "Enemy.h"
 
-class InfantryEnemy : public Enemy {
-    protected:
-        int WeaponType;        
-        float attackRange;
-        float FireCooldown;
-        float FireRate;
-    public:
-        InfantryEnemy(float startX, float startY,  int   startHp, float moveSpeed, int   enemyType,  int   enemyBiome, int   score, int   batchMin, int batchMax, int weaponType, float attackRange, float fireRate)
-        : Enemy(startX, startY, startHp, moveSpeed, enemyType, enemyBiome, score, batchMin, batchMax), WeaponType(weaponType), attackRange(attackRange), FireCooldown(0.0f), FireRate(fireRate){}
+class InfantryEnemy : public Enemy
+{
+protected:
+    int WeaponType;
+    float attackRange;
+    float FireCooldown;
+    float FireRate;
 
-        virtual ~InfantryEnemy(){}
-        virtual void update(float TimeChange) override = 0;
-        virtual void attack() override = 0;
-        virtual Enemy* create(float x, float y, int biome) = 0; 
-        virtual void move(float TimeChange) override {
-            state = state_Patrolling;
-        }
+public:
+    InfantryEnemy(float startX, float startY, int startHp, float moveSpeed, int enemyType, int enemyBiome, int score, int batchMin, int batchMax, int weaponType, float attackRange, float fireRate)
+        : Enemy(startX, startY, startHp, moveSpeed, enemyType, enemyBiome, score, batchMin, batchMax), WeaponType(weaponType), attackRange(attackRange), FireCooldown(0.0f), FireRate(fireRate) {}
 
-        float getFireRate() const{
-            return FireRate;
-        }
-        float getAttackRange() const{
-            return attackRange;
-        }
+    virtual ~InfantryEnemy() {}
+    virtual void update(float TimeChange) override = 0;
+    virtual void attack() override = 0;
+    virtual Enemy *create(float x, float y, int biome) = 0;
+    virtual void move(float TimeChange) override
+    {
+        state = state_Patrolling;
+    }
+
+    float getFireRate() const
+    {
+        return FireRate;
+    }
+    float getAttackRange() const
+    {
+        return attackRange;
+    }
 };
 
-class RebelSoldier : public InfantryEnemy {
-    public:
-        RebelSoldier(float startX , float StartY , int enemyBiome)
-        : InfantryEnemy(startX , StartY , 2 , 1.0f , type_Rebel_Soldier , enemyBiome , 50 , 2 , 4 , weapon_Bullet , 1.0f , 5.0f) {} 
+class RebelSoldier : public InfantryEnemy
+{
+public:
+    RebelSoldier(float startX, float StartY, int enemyBiome)
+        : InfantryEnemy(startX, StartY, 2, 1.0f, type_Rebel_Soldier, enemyBiome, 50, 2, 4, weapon_Bullet, 1.0f, 5.0f) {}
 
-        virtual ~RebelSoldier() {}
+    virtual ~RebelSoldier() {}
 
-        void attack() override {
-           state = state_Attacking;
+    void attack() override
+    {
+        state = state_Attacking;
+    }
+    Enemy *create(float x, float y, int biome) override
+    {
+        return new RebelSoldier(x, y, biome);
+    }
+
+    void update(float TimeChange) override
+    {
+        if (!isAlive)
+        {
+            return;
         }
-        Enemy* create(float x, float y, int biome) override{
-            return new RebelSoldier(x, y, biome);
+
+        if (FireCooldown > 0.0f)
+        {
+            FireCooldown -= TimeChange;
         }
-        
-        void update(float TimeChange) override {
-            if(!isAlive){
-                return;
-            }
 
-            if(FireCooldown > 0.0f){
-                FireCooldown -= TimeChange;
-            }
-
-            if(state == state_Attacking){
-                attack();
-            }
-            else{
-                move(TimeChange);
-            }
-      }
+        if (state == state_Attacking)
+        {
+            attack();
+        }
+        else
+        {
+            move(TimeChange);
+        }
+    }
 };
 
-class ShieldedSoldier : public InfantryEnemy {
-    private:
-        bool ActiveShield;
-        int shieldDirection;
-    public: 
-        ShieldedSoldier(float startX, float startY, int enemyBiome)
-        : InfantryEnemy(startX, startY , 5, 0.8f , type_Shielded_Soldier, enemyBiome, 75, 1, 2, weapon_Bullet, 1.0f, 5.0f),
-          ActiveShield(true), shieldDirection(dir_Left){}
+class ShieldedSoldier : public InfantryEnemy
+{
+private:
+    bool ActiveShield;
+    int shieldDirection;
 
-        virtual ~ShieldedSoldier() {}
+public:
+    ShieldedSoldier(float startX, float startY, int enemyBiome)
+        : InfantryEnemy(startX, startY, 5, 0.8f, type_Shielded_Soldier, enemyBiome, 75, 1, 2, weapon_Bullet, 1.0f, 5.0f),
+          ActiveShield(true), shieldDirection(dir_Left) {}
 
-        bool canbeHit(int hitDirection , int weaponType) const {
+    virtual ~ShieldedSoldier() {}
 
-            if(weaponType == weapon_Explosion || weaponType == weapon_Fire){
-                return true;
-            }
+    bool canbeHit(int hitDirection, int weaponType) const
+    {
 
-            if(hitDirection != shieldDirection){
-                return true;
-            }
-
-            return false;
+        if (weaponType == weapon_Explosion || weaponType == weapon_Fire)
+        {
+            return true;
         }
 
-        Enemy* create(float x, float y, int biome) override{
-                return new ShieldedSoldier(x, y, biome);
+        if (hitDirection != shieldDirection)
+        {
+            return true;
         }
 
-        void takeDamage(int amount, int weaponType, int hitDirection) override {
-            if (!isAlive) return;
-    
-            if (!canbeHit(hitDirection, weaponType))
-                return;     
-    
-            Hp -= amount;
+        return false;
+    }
 
-            if (Hp <= 0){
-                Hp = 0;
-                die();
-            }
+    Enemy *create(float x, float y, int biome) override
+    {
+        return new ShieldedSoldier(x, y, biome);
+    }
+
+    void takeDamage(int amount, int weaponType, int hitDirection) override
+    {
+        if (!isAlive)
+            return;
+
+        if (!canbeHit(hitDirection, weaponType))
+            return;
+
+        Hp -= amount;
+
+        if (Hp <= 0)
+        {
+            Hp = 0;
+            die();
+        }
+    }
+
+    void attack() override
+    {
+        state = state_Attacking;
+    }
+
+    void update(float TimeChange) override
+    {
+        if (!isAlive)
+        {
+            return;
         }
 
-        void attack() override {
-            state = state_Attacking;
+        if (FireCooldown > 0.0f)
+        {
+            FireCooldown -= TimeChange;
         }
 
-        void update(float TimeChange) override {
-            if(!isAlive){
-                return;
-            }
-
-            if(FireCooldown > 0.0f){
-                FireCooldown -= TimeChange;
-            }
-
-            if(state == state_Attacking){
-                attack();
-            }
-            else{
-                move(TimeChange);
-            }
+        if (state == state_Attacking)
+        {
+            attack();
         }
-
-        bool getShieldActive() const {
-            return ActiveShield;
+        else
+        {
+            move(TimeChange);
         }
+    }
+
+    bool getShieldActive() const
+    {
+        return ActiveShield;
+    }
 };
 
-class BazookaSoldier : public InfantryEnemy { 
-    private:
-        float reloadTime;
-        float reloadcooldown;
-        bool  isReloading;
-        float rocketAngle;
-    public:
-        BazookaSoldier(float startX, float startY, int enemyBiome)
-        : InfantryEnemy(startX, startY, 2 ,  0.5f, type_Bazooka_soldier, enemyBiome, 100 , 1, 2, weapon_Explosion , 0.5f ,8.0f), 
+class BazookaSoldier : public InfantryEnemy
+{
+private:
+    float reloadTime;
+    float reloadcooldown;
+    bool isReloading;
+    float rocketAngle;
+
+public:
+    BazookaSoldier(float startX, float startY, int enemyBiome)
+        : InfantryEnemy(startX, startY, 2, 0.5f, type_Bazooka_soldier, enemyBiome, 100, 1, 2, weapon_Explosion, 0.5f, 8.0f),
           reloadTime(0.0f), reloadcooldown(2.0f), isReloading(false), rocketAngle(60.0f) {}
 
-          virtual ~BazookaSoldier() {}
+    virtual ~BazookaSoldier() {}
 
-        void attack () override {
-            if(isReloading){
-                return;
-            }
-            state = state_Attacking;
-            isReloading = true;
-            reloadTime = reloadcooldown;
+    void attack() override
+    {
+        if (isReloading)
+        {
+            return;
         }
+        state = state_Attacking;
+        isReloading = true;
+        reloadTime = reloadcooldown;
+    }
 
-        Enemy* create(float x, float y, int biome) override{
-            return new BazookaSoldier(x, y, biome);
+    Enemy *create(float x, float y, int biome) override
+    {
+        return new BazookaSoldier(x, y, biome);
+    }
+
+    void update(float TimeChange) override
+    {
+        if (!isAlive)
+        {
+            return;
         }
-
-        void update(float TimeChange) override {
-            if(!isAlive){
-                return;
-            }
-            if(isReloading){
-                reloadTime -= TimeChange;
-                if(reloadTime <= 0.0f){
-                    isReloading = false;
-                    reloadTime = 0.0f;
-                }
-            }
-
-            if(state == state_Attacking){
-                attack();
-            }
-            else{
-                move(TimeChange);
-
+        if (isReloading)
+        {
+            reloadTime -= TimeChange;
+            if (reloadTime <= 0.0f)
+            {
+                isReloading = false;
+                reloadTime = 0.0f;
             }
         }
 
-        bool getIsReloading() const{
-            return isReloading;
+        if (state == state_Attacking)
+        {
+            attack();
         }
+        else
+        {
+            move(TimeChange);
+        }
+    }
 
-        float getReloadTime() const{
-            return reloadTime;
-        }
+    bool getIsReloading() const
+    {
+        return isReloading;
+    }
 
-        float getRocketAngle() const{
-            return rocketAngle;
-        }
+    float getReloadTime() const
+    {
+        return reloadTime;
+    }
+
+    float getRocketAngle() const
+    {
+        return rocketAngle;
+    }
 };
 
-class GrenadeSoldier : public InfantryEnemy {
-    private: 
-        float throwAngle;
-        float throwForce;
-        float throwCoolDown;
-        float throwTime;
-    public:
-        GrenadeSoldier(float startX, float startY, int enemyBiome)
+class GrenadeSoldier : public InfantryEnemy
+{
+private:
+    float throwAngle;
+    float throwForce;
+    float throwCoolDown;
+    float throwTime;
+
+public:
+    GrenadeSoldier(float startX, float startY, int enemyBiome)
         : InfantryEnemy(startX, startY, 2, 0.8f, type_Grenade_Soldier, enemyBiome, 100, 1, 2, weapon_Explosion, 0.8f, 7.0f),
-          throwAngle(45.0f), throwForce(10.0f), throwCoolDown(1.5f), throwTime(0.0f){}
+          throwAngle(45.0f), throwForce(10.0f), throwCoolDown(1.5f), throwTime(0.0f) {}
 
-        virtual ~GrenadeSoldier() {}
+    virtual ~GrenadeSoldier() {}
 
-        void attack() override {
-            if(throwTime > 0.0f){
-                return;
-            }
-            state = state_Attacking;
-            throwTime = throwCoolDown;
+    void attack() override
+    {
+        if (throwTime > 0.0f)
+        {
+            return;
         }
-        Enemy* create(float x, float y, int biome) override{
-            return new GrenadeSoldier(x, y, biome);
+        state = state_Attacking;
+        throwTime = throwCoolDown;
+    }
+    Enemy *create(float x, float y, int biome) override
+    {
+        return new GrenadeSoldier(x, y, biome);
+    }
+
+    void update(float TimeChange) override
+    {
+        if (!isAlive)
+        {
+            return;
         }
 
-        void update(float TimeChange) override {
-            if(!isAlive){
-                return;
-            }
-
-            if(throwTime > 0.0f){
-                throwTime -= TimeChange;
-            }
-
-            if(state == state_Attacking){
-                attack();
-            }
-            else{
-                move(TimeChange);
-            }
-        } 
-
-        float getThrowAngle() const{
-            return throwAngle;
+        if (throwTime > 0.0f)
+        {
+            throwTime -= TimeChange;
         }
-        float getThrowForce() const{
-            return throwForce;
+
+        if (state == state_Attacking)
+        {
+            attack();
         }
+        else
+        {
+            move(TimeChange);
+        }
+    }
+
+    float getThrowAngle() const
+    {
+        return throwAngle;
+    }
+    float getThrowForce() const
+    {
+        return throwForce;
+    }
 };

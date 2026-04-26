@@ -3,10 +3,11 @@
 
 class Eri : public Player
 {
-public:
+private:
     bool doubleGrenadeActive;
     float doubleGrenadeTimer;
 
+public:
     Eri(float startX, float startY, int pw, int ph) : Player(startX, startY, "Sprites/eri.png", pw, ph)
     {
         // PDF ke mutabiq:
@@ -32,6 +33,11 @@ public:
     bool canMelee()
     {
         return false;
+    }
+
+    bool getDoubleGrenadeActive() const
+    {
+        return doubleGrenadeActive;
     }
 
     void updateTimers(float dt) override

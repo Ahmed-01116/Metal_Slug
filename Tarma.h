@@ -3,11 +3,12 @@
 
 class Tarma : public Player
 {
-public:
+private:
     bool immunityActive;
     float immunityTimer;
     bool inVehicle;
 
+public:
     Tarma(float startX, float startY, int pw, int ph) : Player(startX, startY, "Sprites/tarma.png", pw, ph)
     {
         // 20% slower on foot
@@ -37,6 +38,19 @@ public:
     {
         // Tarma survives — kuch nahi hota usse
         inVehicle = false;
+    }
+
+    bool getImmunityActive() const
+    {
+        return immunityActive;
+    }
+    bool getInVehicle() const
+    {
+        return inVehicle;
+    }
+    void setInVehicle(bool v)
+    {
+        inVehicle = v;
     }
 
     void takeDamage() override

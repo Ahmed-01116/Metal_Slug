@@ -3,10 +3,11 @@
 
 class Fiolina : public Player
 {
-public:
+private:
     bool superchargedActive;
     float superchargedTimer;
 
+public:
     Fiolina(float startX, float startY, int pw, int ph) : Player(startX, startY, "Sprites/fiolina.png", pw, ph)
     {
         // PDF ke mutabiq:
@@ -26,6 +27,10 @@ public:
     {
         superchargedActive = true;
         superchargedTimer = 10.0f;
+    }
+    bool getSuperchargedActive() const
+    {
+        return superchargedActive;
     }
 
     void updateTimers(float dt) override
