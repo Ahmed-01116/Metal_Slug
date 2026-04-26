@@ -4,42 +4,38 @@ using namespace sf;
 
 class Player
 {
-public:
-    // Position
+protected:
+    // Core data
     float x, y;
     float velocityX, velocityY;
 
-    // Stats
     float maxSpeed, acceleration, gravity;
     int lives;
     int grenades;
+
     bool isGrounded, facingRight;
 
-    // Size
     float scaleX, scaleY;
     int Pwidth, Pheight;
 
-    // Damage State
-    // 0 = NORMAL, 1 = INJURED, 2 = CRITICAL, 3 = DEAD
     int damageState;
     float damageTimer;
 
-    // Character State
-    // 0 = NORMAL, 1 = UNDEAD, 2 = MUMMY
     int charState;
     float stateTimer;
 
-    // Sprite
     Texture texture;
     Sprite sprite;
 
-    Player(float startX, float startY, const char *spritePath, int pw, int ph, float sX = 4.0f, float sY = 4.0f)
+public:
+    Player(float startX, float startY, const char *spritePath, int pw, int ph,
+           float sX = 4.0f, float sY = 4.0f)
     {
         x = startX;
         y = startY;
 
-        velocityX = 0;
-        velocityY = 0;
+        velocityX = velocityY = 0;
+
         maxSpeed = 5.0f;
         acceleration = 0.5f;
         gravity = 0.5f;
@@ -52,6 +48,7 @@ public:
 
         damageState = 0;
         damageTimer = 0;
+
         charState = 0;
         stateTimer = 0;
 
@@ -67,7 +64,6 @@ public:
 
     void handleInput()
     {
-        // Mummy state mein movement band
         if (charState == 2)
         {
             velocityX = 0;
@@ -79,8 +75,8 @@ public:
             velocityX += acceleration;
             if (velocityX > maxSpeed)
                 velocityX = maxSpeed;
+
             sprite.setScale(scaleX, scaleY);
-            sprite.setOrigin(0, 0);
             facingRight = true;
         }
         else if (Keyboard::isKeyPressed(Keyboard::Left))
@@ -88,8 +84,8 @@ public:
             velocityX -= acceleration;
             if (velocityX < -maxSpeed)
                 velocityX = -maxSpeed;
+
             sprite.setScale(-scaleX, scaleY);
-            sprite.setOrigin(29, 0);
             facingRight = false;
         }
         else
@@ -100,7 +96,6 @@ public:
 
     void applyPhysics()
     {
-        // Undead state mein 50% slow
         if (charState == 1)
             x += velocityX * 0.5f;
         else
@@ -116,43 +111,33 @@ public:
             velocityY = -12.0f;
     }
 
-    // Damage system — 3 hit
     virtual void takeDamage()
     {
-        if (damageState != 0)
-            return;
-
-        if (damageState == 0) // NORMAL -> INJURED
-        {
+        if (damageState == 0)
             damageState = 1;
-            damageTimer = 1.0f;
-        }
-        else if (damageState == 1) // INJURED -> CRITICAL
-        {
+        else if (damageState == 1)
             damageState = 2;
-            damageTimer = 1.0f;
-        }
-        else if (damageState == 2) // CRITICAL -> DEAD
+        else if (damageState == 2)
         {
             damageState = 3;
             lives--;
         }
+
+        damageTimer = 1.0f;
     }
 
     virtual void updateTimers(float dt)
     {
-        // Damage timer
         if (damageState == 1 || damageState == 2)
         {
             damageTimer -= dt;
             if (damageTimer <= 0)
             {
-                damageState = 0; // Wapas normal
+                damageState = 0;
                 damageTimer = 0;
             }
         }
 
-        // Character state timer
         if (charState == 1 || charState == 2)
         {
             stateTimer -= dt;
@@ -167,14 +152,32 @@ public:
     void setUndead()
     {
         charState = 1;
-        stateTimer = 10.0f; // 10 seconds
+        stateTimer = 10.0f;
     }
 
     void setMummy()
     {
         charState = 2;
-        stateTimer = 10.0f; // 10 seconds
+        stateTimer = 10.0f;
     }
+
+    float getX() const { return x; }
+    float getY() const { return y; }
+
+    float getVelocityX() const { return velocityX; }
+    float getVelocityY() const { return velocityY; }
+
+    int getWidth() const { return Pwidth; }
+    int getHeight() const { return Pheight; }
+
+    bool getIsGrounded() const { return isGrounded; }
+
+    void setIsGrounded(bool b) { isGrounded = b; }
+
+    void setX(float v) { x = v; }
+    void setY(float v) { y = v; }
+    void setVelocityY(float v) { velocityY = v; }
+    void setVelocityX(float v) { velocityX = v; }
 
     virtual void draw(RenderWindow &window, float offsetX)
     {
