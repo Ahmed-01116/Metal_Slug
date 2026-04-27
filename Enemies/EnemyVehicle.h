@@ -8,12 +8,10 @@ protected:
     float weaponCooldown;
 
 public:
-    // Constructor
     VehicleEnemy(float startX, float startY, int startHp, float moveSpeed, int enemyType, int enemyBiome, int score)
         : Enemy(startX, startY, startHp, moveSpeed, enemyType, enemyBiome, score, 1, 1),
           vehicleHp(startHp), weaponCooldown(0.0f) {}
 
-    // Deconstructor
     virtual ~VehicleEnemy() {}
 
     // Functions implemented by child

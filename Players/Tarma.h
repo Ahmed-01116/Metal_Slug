@@ -76,7 +76,7 @@ public:
             }
         }
     }
-
+  
     void draw(RenderWindow &window, float offsetX) override
     {
         Player::draw(window, offsetX);

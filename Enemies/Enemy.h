@@ -1,4 +1,7 @@
 #pragma once
+#include <SFML/Graphics.hpp>
+using namespace sf;
+
 // Enemy States
 const int state_Idle = 0;
 const int state_Patrolling = 1;
@@ -68,7 +71,6 @@ public:
         {
             return;
         }
-
         Hp -= amount;
         if (Hp <= 0)
         {
@@ -82,6 +84,8 @@ public:
         isAlive = false;
         state = state_Dead;
     }
+
+    virtual void draw(RenderWindow &window, float offsetX) {}
 
     // Getters
     float getX() const

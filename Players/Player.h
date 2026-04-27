@@ -28,7 +28,7 @@ protected:
     Sprite sprite;
 
 public:
-    Player(float startX, float startY, const char *spritePath, int pw, int ph, float sX = 4.0f, float sY = 4.0f)
+    Player(float startX, float startY, const char *spritePath, int pw, int ph, float sX = 4.5f, float sY = 4.5f)
     {
         x = startX;
         y = startY;
@@ -109,7 +109,7 @@ public:
     void jump()
     {
         if (isGrounded)
-            velocityY = -12.0f;
+            velocityY = -15.0f;
     }
 
     virtual void takeDamage()

@@ -76,11 +76,16 @@ public:
         if (!landed)
         {
             // Coming Down to ground
-            height -= downSpeed * TimeChange;
-            y = height;
+            // height -= downSpeed * TimeChange;
+            // y = height;
+            y += downSpeed * TimeChange;
 
-            if (height <= 0.0f)
-            { // ground level on ground
+            // if (height <= 0.0f)
+            // { // ground level on ground
+            //     landed = true;
+            if (y >= 13.0f * 64)
+            {
+                y = 13.0f * 64;
                 landed = true;
                 state = state_Patrolling;
             }
@@ -184,8 +189,16 @@ public:
     // explosion and fire kill it and bullets crumble it
     void takeDamage(int amount, int weaponType, int hitDirection) override
     {
-        if (!isAlive || isCrumbled)
+        if (!isAlive)
+            return;
+
+        if (isCrumbled)
         {
+            if (weaponType == weapon_Fire || weaponType == weapon_Explosion)
+            {
+                Hp = 0;
+                die();
+            }
             return;
         }
 

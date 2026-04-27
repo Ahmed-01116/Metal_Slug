@@ -1,12 +1,13 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Player.h"
-#include "Marco.h"
-#include "Tarma.h"
-#include "Eri.h"
-#include "Fio.h"
-#include "Enemy.h"
-#include "EnemyFactory.h"
+
+#include "Players/Player.h"
+#include "Players/Marco.h"
+#include "Players/Tarma.h"
+#include "Players/Eri.h"
+#include "Players/Fio.h"
+
+#include "Enemies/EnemyFactory.h"
 
 using namespace sf;
 
@@ -168,7 +169,7 @@ private:
 
                 float px = active->getX();
                 float py = active->getY();
-                
+
                 float pRight = px + active->getWidth();
                 float pBottom = py + active->getHeight();
                 float tRight = tileX + cellSize;
@@ -205,6 +206,14 @@ private:
 
         displayLevel();
         active->draw(window, offsetX);
+        // Enemies draw (temporary — jab Enemy mein draw aayega)
+        Enemy **enemies = spawnFactory.getEnemies();
+        int count = spawnFactory.getEnemyCount();
+        for (int i = 0; i < count; i++)
+        {
+            if (enemies[i] && enemies[i]->getIsAlive())
+                enemies[i]->draw(window, offsetX);
+        }
 
         window.display();
     }
